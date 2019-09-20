@@ -1,0 +1,120 @@
+#include<lab08.h>
+using namespace std;
+IntegerSet IntegerSet::operator+(uint e) const
+{
+    IntegerSet copySet(*this);
+
+    if (this->isValid(e) && !this->isMember(e))
+    {
+        uint myWord = this->bitVector[this->word(e)];
+        int myN = this->bit(e);
+        
+        myWord = setBit(myWord, myN, 1);
+        copySet.bitVector[this->word(e)] = myWord;
+    }
+    return copySet;
+    
+}
+IntegerSet IntegerSet::operator-(uint e) const
+{
+    IntegerSet copy(*this);
+   
+    if (this->isValid(e) && this->isMember(e))
+    {
+        uint myWord = this->bitVector[this->word(e)];
+        int myN = this->bit(e);
+        
+        myWord = setBit(myWord, myN, 0);
+        copy.bitVector[this->word(e)] = myWord;
+    }
+    return copy;
+}    // if e is valid and a member of
+//   the set, delete e from set
+IntegerSet IntegerSet::operator-() const
+{    IntegerSet myComplement;
+    // ...declare a local interset object
+    int count = 0;
+    for ( int i = 0;  i < 2; i++)
+    {
+        myComplement.bitVector[i]= this->bitVector[i];
+    }
+    for (int j = 0; j < 2; j++)
+    {
+        for (int k= 0; k < 32; k++)
+        {
+            if( getBit(this-> bitVector[j], k) && count < 40)
+            {
+                myComplement.bitVector[j] = setBit(myComplement.bitVector[j],k,0);
+            }
+            else if( !getBit(this-> bitVector[j], k) && count < 40)
+            {
+                myComplement.bitVector[j] = setBit(myComplement.bitVector[j],k,1);
+            }
+            count++;
+        }
+    }
+    
+   
+   
+    return myComplement;
+}    // complement of a Set
+IntegerSet& IntegerSet::operator=(const IntegerSet& rhs)
+// *this = rhs;
+{
+    if ( this!= &rhs)
+        //loop through the universal  0.1.2....n-1.
+        for ( uint e = 0; e< N; e++)
+        {
+            uint myWord = this->bitVector[this->word(e)];
+            int myN = this->bit(e);
+            
+            int myV;//myWord = setBit(myWord, myN, 1);
+            if ( rhs.isMember(e))
+            {
+                //*this = *this + e;
+                myV =1;
+            }
+            else
+                //*this = *this -e;
+                myV =0;
+            myWord = setBit(myWord, myN, myV);
+            this->bitVector[this->word(e)] = myWord;
+        }
+    return *this;
+}
+ostream& operator<<(ostream& out, const IntegerSet& set)
+{
+    if (set.cardinality() == 0)
+    {
+        out << static_cast<char>(216) << endl;
+    }
+    
+    else
+    {
+        out << '{';
+        //...
+        uint i= 0;
+        string comma = ",";
+        uint count = 0;
+        for ( i = 0;i < N  ; i++)
+        {
+            if (count == set.cardinality() -1)
+            { comma = "";
+                
+            }
+            if ( set.isMember(i))
+            {
+                
+                out << i <<comma;
+                count +=1 ;
+                
+            }
+            
+        }
+        
+        out << '}'<<endl;
+        
+    }
+    
+    return out;
+}
